@@ -1,0 +1,6 @@
+#!/system/bin/sh
+
+BUSYBOX=/sbin/busybox.boot
+
+$BUSYBOX touch /sdcard/.bootscript/bootsdcard
+

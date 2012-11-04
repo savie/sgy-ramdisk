@@ -1,0 +1,5 @@
+#!/system/bin/sh
+
+BUSYBOX=/sbin/busybox.boot
+
+$BUSYBOX rm -Rf /sdcard/.bootscript/bootsdcard

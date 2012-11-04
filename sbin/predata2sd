@@ -1,0 +1,66 @@
+#!/system/bin/sh
+
+BUSYBOX=/system/xbin/busybox
+PART_TYPE=ext4
+PART_DAT=/dev/block/mmcblk0p2
+SCRIPT_TMP=/tmp/bootscript
+SCRIPT_SCR=/sdcard/.bootscript
+SCRIPT_BIN=/system/bin
+
+$BUSYBOX mount -o remount,rw -t ext4 /dev/block/stl9 $SCRIPT_SYS
+$BUSYBOX mount -o remount,rw -t ext4 / /
+$BUSYBOX mount -a
+
+if $BUSYBOX test ! -d $SCRIPT_SCR ; then
+	$BUSYBOX mkdir $SCRIPT_SCR
+fi
+$BUSYBOX sync
+
+$BUSYBOX umount /sdcard
+$BUSYBOX mount -t vfat -o rw,nosuid,nodev,noexec,uid=1000,gid=1015,fmask=0002,dmask=0002,allow_utime=0020,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro /dev/block/mmcblk0p1 /sdcard
+$BUSYBOX sleep 1
+
+$BUSYBOX mount -t vfat -o remount,rw,nosuid,nodev,noexec,uid=1000,gid=1015,fmask=0002,dmask=0002,allow_utime=0020,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro /dev/block/mmcblk0p1 /sdcard
+$BUSYBOX sleep 1
+
+if $BUSYBOX test -d /sdcard ; then
+	$BUSYBOX rm -Rf $SCRIPT_TMP/ReadMe
+	$BUSYBOX rm -Rf $SCRIPT_SCR/post-data
+	$BUSYBOX rm -Rf $SCRIPT_SCR/post-system
+	$BUSYBOX rm -Rf $SCRIPT_SCR/ReadMe
+	$BUSYBOX mkdir $SCRIPT_SCR
+	$BUSYBOX touch $SCRIPT_SCR/post-data
+	$BUSYBOX echo "#!/sbin/busybox.boot sh" >> $SCRIPT_SCR/post-data
+	$BUSYBOX echo "if [ -f /tmp/bootscript/bootsdcard ]" >> $SCRIPT_SCR/post-data
+	$BUSYBOX echo "then" >> $SCRIPT_SCR/post-data
+	$BUSYBOX echo "/sbin/busybox.boot umount /data" >> $SCRIPT_SCR/post-data
+	$BUSYBOX echo "/sbin/busybox.boot mount -t $PART_TYPE $PART_DAT /data" >> $SCRIPT_SCR/post-data
+	$BUSYBOX echo "fi" >> $SCRIPT_SCR/post-data
+	$BUSYBOX touch $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "DATA2SD savieKernel" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "Data2SD features is to activate data2sd" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "inspiring from irfanbagus@xda and modified by savie@xda" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo " " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "please read this thread first to understand dualboot features http://forum.xda-developers.com/showthread.php?t=1598803 " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo " " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "Create 2 partition of sdcard using MiniTools Partition application in windows-PC" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "List of partition:" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- partition1 for Data storage = fat32-primary-minimal size ---Mb" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- partition2 for External storage = ext4-primary-minimal size 199Mb" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo " " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "Use TerminalEmulator to activate data2sd" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- write su <enter>" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- write data2sd <enter> --> /data use external memory" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- write nodata2sd <enter> --> /data use internal memory" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo " " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "Note" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- Don't use another a2sd method like Darktemor-script, Link2SD, Akuro-Script, and other" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- Make sure your 2nd partition as ext3 to use Data2SD" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "- If you still want to use Link2SD or Akoro-Script (Darktemor-script not recomended) create partition3 as ext3 then change mmcblk0p2 to mmcblk0p3 in file $SCRIPT_SCR/post-data" >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo " " >> $SCRIPT_SCR/ReadMe
+	$BUSYBOX echo "By: savie@xda " >> $SCRIPT_SCR/ReadMe
+fi
+$BUSYBOX sync
+
+$BUSYBOX umount /sdcard
+$BUSYBOX sync
